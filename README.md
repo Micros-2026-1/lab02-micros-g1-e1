@@ -152,6 +152,25 @@ Por eso a veces se usa un cristal externo (ej. 16 MHz, 20 MHz) para tener una fr
 
 ## 2.4 Diagramas
 
+![alt text](image-3.png)
+Fig 1.Arquitectura de selección del reloj [1]
+
+
+![alt text](image-4.png)
+Fig 2.Oscilador externo (modos LP,XT y HS)[1]
+
+
+![alt text](image-5.png)
+Fig 3.Oscilador externo modo RC [1]
+
+
+![alt text](image-6.png)
+Fig 4. Señal externa
+
+
+![alt text](image-7.png)
+Fig 5. Registro OSCCON [1]
+
 ## 2.5 Formas de onda
 
 ### INTOSC (interno) 
