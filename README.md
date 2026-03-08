@@ -12,9 +12,6 @@
 
 En esta práctica de laboratorio se configuro el microcontrolador PIC18F45K22 para realizar el control de una salida digital. El programa, escrito en lenguaje de C y compilado con XC8 desde MPLAB, utiliza la libreria (xc.h) para detectar automaticamente que microcontrolador seleccionamos en el proyecto de MPLAB
 
-**Claves Importantes en el Codigo y su explicación**
-
-
 ### 2.1 Descripción del laboratorio
 
 ### 2.2 Explicación del código implementado
