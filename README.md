@@ -2,8 +2,11 @@
 [![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=22820198&assignment_repo_type=AssignmentRepo)
 # Lab02 - Caracterización de osciladores (externo vs. interno)
 
-
 ## 1. Integrantes
+
+* [Laura Alejandra Fuentes Ubaque](https://github.com/LauraAlejandraFuentes)
+* [Juan Sebastian Guerrero Gualteros](https://github.com/juanseguerrerogu07)
+* [Pedro Felipe Jimenez Celis](https://github.com/pedrofejimenezce-ship-it)
 
 ## 2. Documentación
 
