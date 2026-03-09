@@ -119,6 +119,108 @@ Por eso a veces se usa un cristal externo (ej. 16 MHz, 20 MHz) para tener una fr
 
 ### 2.2 Explicación del código implementado
 
+Los tres códigos tienen como objetivo configurar distintos tipos de osciladores en el PIC18F45K22 y generar una señal cuadrada en un pin de salida para observarla con un osciloscopio.
+
+Cada programa utiliza una fuente de reloj diferente: oscilador interno, cristal externo y oscilador RC externo, con el fin de comparar su precisión, estabilidad y comportamiento.
+
+La señal generada se obtiene encendiendo y apagando un pin con retardos, produciendo una frecuencia aproximada de 500 Hz
+
+Primer codigo:
+
+    #include <xc.h>
+    #include <stdint.h> 
+
+El xc.h permite usar los registros del microcontrolador. Y stdint.h permite usar tipos de datos como uint16_t.
+
+    #pragma config FOSC = INTIO67
+
+Configura el micro para usar el oscilador interno.
+Los pines OSC1 y OSC2 quedan como pines digitales.
+
+    #define _XTAL_FREQ 4000000
+
+Indica que el microcontrolador trabaja a 4 MHz.
+
+    __delay_ms()
+
+Esre se utiliza para que se calculen correctamente los tiempos.
+
+    void main(void)
+
+Este comienza comienza la ejecución del programa.
+
+    OSCCONbits.IRCF = 0b101;
+
+Este registro selecciona la frecuencia del oscilador interno.
+- 101 corresponde a 4MHz
+
+    TRISBbits.TRISB0 = 1;
+    TRISBbits.TRISB1 = 0;
+    TRISBbits.TRISB2 = 1;
+    TRISBbits.TRISB3 = 0;
+    TRISBbits.TRISB4 = 1;
+    TRISBbits.TRISB5 = 0;
+
+Los registros TRIS determinan si un pin es entrada o salida, 1 representando la entrada y el 0 la salida.
+
+    ANSELB = 0;
+
+Este comando desactiva el modo analogico
+
+    while(1)
+
+Este ciclo hace que el programa se ejecute continuamente.
+
+    if (PORTBbits.RB0 == 1)
+    {
+    LATBbits.LATB1 = 1;
+    }
+    else
+    {
+    LATBbits.LATB1 = 0;
+    }
+
+Este es el control de las salidas si RB0 está en alto, entonces RB1 se enciende.
+
+    if (PORTBbits.RB2 == 1)
+    {
+    LATBbits.LATB3 = 1;
+    }
+    else
+    {
+    LATBbits.LATB3 = 0;
+    }
+
+RB2 controla a RB3
+
+    if (PORTBbits.RB4 == 1)
+    {
+    LATBbits.LATB5 = 1;
+    }
+    else
+    {
+    LATBbits.LATB5 = 0;
+    }
+
+y RB4 contola a RB5
+
+Del segundo Codigo, cambia la fuente de reloj del microprocesador, cambiando el oscilador interno, por el cristal externo, en este codigo se terminará de explicar lo diferente al primer codigo.
+
+    #pragma config FOSC = HSHP
+
+Esto indica que el micro usa un cristal externo de alta velocidad, El cristal se conecta entre los pines OSC1, OSC2, con capacitores a tierra.
+
+    #define _XTAL_FREQ 16000000
+
+El micro trabaja a 16 MHz porque el cristal tiene esa frecuencia, esto hace que los retardos y la ejecución del programa sean más rápidos y más precisos que con el oscilador interno.
+
+Para el tercer codigo, aquí el micro usa un circuito RC externo para generar el reloj.
+
+    #pragma config FOSC = RC
+
+El reloj depende de una resistencia y un capacitor externos.
+
+
 ### 2.3 Análisis y comparación
 
 #### Tabla 1: Medición en frío
