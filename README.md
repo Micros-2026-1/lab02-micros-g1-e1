@@ -343,7 +343,10 @@ Fig 5. Registro OSCCON [1]
 ![alt text](image-2.png)
 
 ## 3. Evidencias de implementación
-
+* [Video lab1](https://youtu.be/1uqVIVOrfaQ)
+* [Video lab2](https://youtu.be/LPDfCZH4naY)
+* [Video lab3](https://youtu.be/ne4GAs_R6sE)
+* [Video Simulacion](https://youtu.be/C1sOraezwtQ)
 ## 4. Preguntas
 
 * ¿En qué modo se obtuvo la medición más cercana a la frecuencia teórica?
