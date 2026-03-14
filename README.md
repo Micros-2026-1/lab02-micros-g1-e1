@@ -410,3 +410,7 @@ Una de las ventajas de este modo es su facilidad ademas de que su accesibilidad 
 Las desventajas que tiene este modo es que es muy impreciso teniendo un buen porcentaje de error, su sensibilidad al calor es muy alta que conlleva a una mayor deriva termica (-3.55Hz), además de la ocupacion de pines que lleva esta configuracion.
 
 ## 5. Referencias
+
+[1] Verle, M. (s.f.). Oscilador de Reloj. En Microcontroladores PIC – Programación en C con ejemplos. MikroElektronika. [Online]: https://www.mikroe.com/ebooks/microcontroladores-pic-programacion-en-c-con-ejemplos/oscilador-de-reloj
+
+[2] Microchip Technology Inc. (s.f.). PICmicro Mid-Range MCU Family Reference Manual (Documento DS33023A). [Online]: de https://ww1.microchip.com/downloads/en/devicedoc/33023a.pdf
