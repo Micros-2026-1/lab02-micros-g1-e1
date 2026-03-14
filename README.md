@@ -153,22 +153,27 @@ Por eso a veces se usa un cristal externo (ej. 16 MHz, 20 MHz) para tener una fr
 ## 2.4 Diagramas
 
 ![alt text](image-3.png)
+
 Fig 1.Arquitectura de selección del reloj [1]
 
 
 ![alt text](image-4.png)
+
 Fig 2.Oscilador externo (modos LP,XT y HS)[1]
 
 
 ![alt text](image-5.png)
+
 Fig 3.Oscilador externo modo RC [1]
 
 
 ![alt text](image-6.png)
+
 Fig 4. Señal externa
 
 
 ![alt text](image-7.png)
+
 Fig 5. Registro OSCCON [1]
 
 ## 2.5 Formas de onda
@@ -193,15 +198,57 @@ Fig 5. Registro OSCCON [1]
 
 * ¿En qué modo se obtuvo la medición más cercana a la frecuencia teórica?
 
+El modo en el que se obtuvo la medición mas cercana a la frecuencia teorica fue en el modo HS (Cristal externo de 16MHz) en este modo obtuvimos una medición de una frecuencia de 500Hz y dentro de la teoria tambien nos dio el mismo valor de frecuencia.
+
 * ¿Fue posible evidenciar el fenómeno de deriva? ¿Qué factores podrían explicar la variación de frecuencia al calentar el PIC?
+
+Si se evidencio el fenomeno de deriva. El modo RC externo fue el que mostró la mayor deriva con una variación de -3.55 Hz entre el frio y el calor, mientras que el mas estable fue Cristal externo de 16MHz.
+
+La variacion se debe a que el calor afecta las propiedades fisicas de los materiales. En el caso del oscilador interno y el RC, la temperatura altera la resistencia y la capacitancia de los nodos, cambiando el tiempo de carga y descarga que es lo que define la frecuencia. Dentro del cristal es mas estable, debido a que el calor afecta muy poco la vibracion del cuarzo.
 
 * ¿Cuál es más preciso en cuanto a frecuencia teórica vs. medida?
 
+De las 3 configuraciones hechas con los osciladores el que menos error tiene o el mas preciso en este caso seria el Cristal de cuarzo de 16MHz, su porcentaje de rror es muy bajo, el que le sigue es el Oscilador interno del PIC tiene un poco de error comparado al Cristal de cuarzo y el ultimo es el Oscilador por un sistema RC,que tiene un error mucho más grande que el resto de los osciladores.
 
 * Explique cómo usar RC0 para estimar la frecuencia del oscilador cuando RA6 no está disponible.
 
+Para utilizar el RC0 para estimar la frecuencia del osiclador cuando RA6 no esta disponible, se crea una señal en RC0 mediante el software. El PIC en este caso ejecuta instrucciones a una velocidad definida por una Frecuencia de instruccion que es igual a la Frecuencia del Oscilador sobre 4. Para tener en cuenta la frecuencia real del oscilador, usando la medida del RC0, nuestro codigo esta configurado a una frecuencia de 16MHz, lo que se espera que ell compilador ejecute las intrucciones a 4MHz. Con esto el código genera una señal en RC0 de 500Hz teoricos.
+
+Si medimos la frecuencia real en el pin RC0 con el osciloscopio, cualquier variacion que haya respeceto a los 500Hz teoricos nos va a permitir calcular la frecuencia real del oscilador. Esto se debe a que el tiempo de procesamiento tarda en ejecutar el ciclo del pin que depende completamente de la velocidad del reloj principal.
+
+
 * Si se quisiera duplicar la frecuencia del PIC usando PLL, ¿en qué modos se podría aplicar?
 
+En los modos que se podria aplicar el PLL seria en los modos: Modo HS y Modo del Oscilador interno.
+
+En el modo del HS la frecuencia del Cristal de cuarzo que se esta usando deberia estar entre 4MHz y 16MHz ya que el PLL elevaria la frecuencia de 16MHz a 64MHz, que es el limite de el PIC18F45K22
+
+En el modo de Oscilador interno, se puede aplicar el PLL ya que si seleccionamos una frecuencia interna de 16MHz y activamos el PLL, el microcontrolador correra a 64MHz. Para hacer el cambio de la oscilacion interna se hace mediante los bits y la configuracion del registro OSCTUNE dentro de la programación.
+
 * Enliste ventajas y desventajas de cada modo.
+
+**Ventajas Oscilador Interno**
+
+En este caso una de las ventajas que tiene el Oscilador Interno es que no se necesitan componentes externos, ademas de la liberacion de pines y que tiene una muy buena precision
+
+**Desventajas Oscilador Interno**
+
+Una de las desventajas del Oscilador Interno es la deriva que tiene, su estabilidad termica es moderada y su deriva es de -1.56Hz con calor
+
+**Ventajas HS (Cristal de cuarzo)**
+
+Tiene una gran precision además de una muy buena estabilidad termica muy buena, es muy buena opcion para aplicaciones que requieren mucha precision
+
+**Desventajas HS (Cristal de cuarzo)**
+
+Una de las desventajas de este modo es que requiere un Cristal de cuarzo y capacitores externos que ocupan dos pines del PIC
+
+**Ventajas RC Externo**
+
+Una de las ventajas de este modo es su facilidad ademas de que su accesibilidad es muy fácil
+
+**Desventajas RC Externo**
+
+Las desventajas que tiene este modo es que es muy impreciso teniendo un buen porcentaje de error, su sensibilidad al calor es muy alta que conlleva a una mayor deriva termica (-3.55Hz), además de la ocupacion de pines que lleva esta configuracion.
 
 ## 5. Referencias
