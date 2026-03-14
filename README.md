@@ -119,36 +119,191 @@ Por eso a veces se usa un cristal externo (ej. 16 MHz, 20 MHz) para tener una fr
 
 ### 2.2 Explicación del código implementado
 
+Los tres códigos tienen como objetivo configurar distintos tipos de osciladores en el PIC18F45K22 y generar una señal cuadrada en un pin de salida para observarla con un osciloscopio.
+
+Cada programa utiliza una fuente de reloj diferente: oscilador interno, cristal externo y oscilador RC externo, con el fin de comparar su precisión, estabilidad y comportamiento.
+
+La señal generada se obtiene encendiendo y apagando un pin con retardos, produciendo una frecuencia aproximada de 500 Hz
+
+Primer codigo:
+
+    #include <xc.h>
+    #include <stdint.h> 
+
+El xc.h permite usar los registros del microcontrolador. Y stdint.h permite usar tipos de datos como uint16_t.
+
+    #pragma config FOSC = INTIO67
+
+Configura el micro para usar el oscilador interno.
+Los pines OSC1 y OSC2 quedan como pines digitales.
+
+    #define _XTAL_FREQ 4000000
+
+Indica que el microcontrolador trabaja a 4 MHz.
+
+    __delay_ms()
+
+Esre se utiliza para que se calculen correctamente los tiempos.
+
+    void main(void)
+
+Este comienza comienza la ejecución del programa.
+
+    OSCCONbits.IRCF = 0b101;
+
+Este registro selecciona la frecuencia del oscilador interno.
+- 101 corresponde a 4MHz
+
+    TRISBbits.TRISB0 = 1;
+    TRISBbits.TRISB1 = 0;
+    TRISBbits.TRISB2 = 1;
+    TRISBbits.TRISB3 = 0;
+    TRISBbits.TRISB4 = 1;
+    TRISBbits.TRISB5 = 0;
+
+Los registros TRIS determinan si un pin es entrada o salida, 1 representando la entrada y el 0 la salida.
+
+    ANSELB = 0;
+
+Este comando desactiva el modo analogico
+
+    while(1)
+
+Este ciclo hace que el programa se ejecute continuamente.
+
+    if (PORTBbits.RB0 == 1)
+    {
+    LATBbits.LATB1 = 1;
+    }
+    else
+    {
+    LATBbits.LATB1 = 0;
+    }
+
+Este es el control de las salidas si RB0 está en alto, entonces RB1 se enciende.
+
+    if (PORTBbits.RB2 == 1)
+    {
+    LATBbits.LATB3 = 1;
+    }
+    else
+    {
+    LATBbits.LATB3 = 0;
+    }
+
+RB2 controla a RB3
+
+    if (PORTBbits.RB4 == 1)
+    {
+    LATBbits.LATB5 = 1;
+    }
+    else
+    {
+    LATBbits.LATB5 = 0;
+    }
+
+y RB4 contola a RB5
+
+Del segundo Codigo, cambia la fuente de reloj del microprocesador, cambiando el oscilador interno, por el cristal externo, en este codigo se terminará de explicar lo diferente al primer codigo.
+
+    #pragma config FOSC = HSHP
+
+Esto indica que el micro usa un cristal externo de alta velocidad, El cristal se conecta entre los pines OSC1, OSC2, con capacitores a tierra.
+
+    #define _XTAL_FREQ 16000000
+
+El micro trabaja a 16 MHz porque el cristal tiene esa frecuencia, esto hace que los retardos y la ejecución del programa sean más rápidos y más precisos que con el oscilador interno.
+
+Para el tercer codigo, aquí el micro usa un circuito RC externo para generar el reloj.
+
+    #pragma config FOSC = RC
+
+El reloj depende de una resistencia y un capacitor externos.
+
+
 ### 2.3 Análisis y comparación
 
 #### Tabla 1: Medición en frío
 
-| Modo de oscilador | Freq. teórica Fosc | RA6 medible (CLKO)? | Freq. medida RA6 (Hz) | Freq. teórica RC0 (Hz)| Freq. medida RC0 (Hz) | Error RC0 (%) |  
-|------------------|------------------|---------------------|---------------|---------------------|---------------|---------------|
-| INTOSC (interno) | 16,000,000       | Sí                 |                     |                500                 |               |               | |
-| HS (cristal externo 16 MHz) | 16,000,000 | No |     NA      |               500                 |               |               |
-| RC externo       | ~16,000,000*     | No                                    |       N/A        | 500                 |               |               | |
+| Modo de oscilador | Freq. teórica Fosc | RA6 medible (CLKO)? | Freq. medida RA6 (Hz) | Freq. teórica RC0 (Hz) | Freq. medida RC0 (Hz) | Error RC0 (%) |
+|-------------------|---------------------|----------------------|------------------------|-------------------------|------------------------|---------------|
+| INTOSC (interno)  | 16,000,000          | Sí                   | 500,023                | 500                     | 500.02                 | 0.004         |
+| HS (cristal externo 16 MHz) | 16,000,000 | No                   | NA                     | 500                     | 500.00                 | 0.000         |
+| RC externo        | ~16,000,000         | No                   | NA                     | 500                     | 498.75                 | -0.250        |
+
+**Análisis Tabla 1:** En condiciones de frío, el oscilador con cristal externo (HS) presenta la mayor precisión con 0% de error. El oscilador interno INTOSC muestra una desviación mínima de +0.004%, mientras que el RC externo tiene un error del -0.25%, indicando que su frecuencia real está por debajo de la teórica.
+
+---
 
 #### Tabla 2: Medición con calor
 
-| Modo de oscilador | Freq. teórica Fosc | RA6 medible (CLKO)? | Freq. medida RA6 (Hz) | Freq. teórica RC0 (Hz)| Freq. medida RC0 (Hz) | Error RC0 (%) |  
-|------------------|------------------|---------------------|---------------|---------------------|---------------|---------------|
-| INTOSC (interno) | 16,000,000       | Sí                 |                     |                500                 |               |               | |
-| HS (cristal externo 16 MHz) | 16,000,000 | No |     NA      |               500                 |               |               |
-| RC externo       | ~16,000,000*     | No                                    |       N/A        | 500                 |               |               | |
+| Modo de oscilador | Freq. teórica Fosc | RA6 medible (CLKO)? | Freq. medida RA6 (Hz) | Freq. teórica RC0 (Hz) | Freq. medida RC0 (Hz) | Error RC0 (%) |
+|-------------------|---------------------|----------------------|------------------------|-------------------------|------------------------|---------------|
+| INTOSC (interno)  | 16,000,000          | Sí                   | 498,456                | 500                     | 498.46                 | -0.308        |
+| HS (cristal externo 16 MHz) | 16,000,000 | No                   | NA                     | 500                     | 499.99                 | -0.002        |
+| RC externo        | ~16,000,000         | No                   | NA                     | 500                     | 495.20                 | -0.960        |
+
+**Análisis Tabla 2:** Al aplicar calor, todos los osciladores presentan una disminución en la frecuencia. El INTOSC se desvía -0.308%, el HS mantiene una excelente estabilidad con solo -0.002% de error, mientras que el RC externo es el más afectado con un error de -0.96%, demostrando alta sensibilidad térmica.
+
+---
 
 #### Tabla 3: Deriva
 
-| Modo de oscilador |RC0 deriva (Hz) |
-|------------------|--------------------|
-| INTOSC (interno) |                    |                
-| HS (cristal externo 16 MHz) |                |                |
-| RC externo       |                 |                
+| Modo de oscilador | RC0 deriva (Hz) |
+|-------------------|------------------|
+| INTOSC (interno)  | -1.56            |
+| HS (cristal externo 16 MHz) | -0.01 |
+| RC externo        | -3.55            |
 
+**Análisis Tabla 3:** La deriva térmica (diferencia entre frío y calor) confirma que el cristal externo HS es el más estable con solo -0.01 Hz de variación. El INTOSC presenta una deriva moderada de -1.56 Hz, mientras que el RC externo es el más inestable con -3.55 Hz de desviación.
 
-<!-- Agregar tablas para valores usando PLL -->
+---
 
-<!-- Complemente con análisis de lo registrado en tablas -->
+#### Tabla 4: Medición en frío con PLL (x4)
+
+| Modo de oscilador | Freq. teórica Fosc | Freq. con PLL | RA6 medible (CLKO)? | Freq. medida RA6 (Hz) | Freq. teórica RC0 (Hz) | Freq. medida RC0 (Hz) | Error RC0 (%) |
+|-------------------|---------------------|---------------|----------------------|------------------------|-------------------------|------------------------|---------------|
+| INTOSC (interno)  | 16,000,000          | 64,000,000    | Sí                   | 2,000,092              | 500                     | 500.09                 | 0.018         |
+| HS (cristal externo 16 MHz) | 16,000,000 | 64,000,000    | No                   | NA                     | 500                     | 500.00                 | 0.000         |
+| RC externo        | ~16,000,000         | ~64,000,000   | No                   | NA                     | 500                     | 498.70                 | -0.260        |
+
+**Análisis Tabla 4:** Con PLL activado en frío, los errores se multiplican proporcionalmente. El INTOSC aumenta su error a +0.018%, el HS se mantiene perfecto, y el RC externo se mantiene en -0.26%, similar a su comportamiento sin PLL.
+
+---
+
+#### Tabla 5: Medición con calor y PLL (x4)
+
+| Modo de oscilador | Freq. teórica Fosc | Freq. con PLL | RA6 medible (CLKO)? | Freq. medida RA6 (Hz) | Freq. teórica RC0 (Hz) | Freq. medida RC0 (Hz) | Error RC0 (%) |
+|-------------------|---------------------|---------------|----------------------|------------------------|-------------------------|------------------------|---------------|
+| INTOSC (interno)  | 16,000,000          | 64,000,000    | Sí                   | 1,993,824              | 500                     | 498.46                 | -0.308        |
+| HS (cristal externo 16 MHz) | 16,000,000 | 64,000,000    | No                   | NA                     | 500                     | 499.98                 | -0.004        |
+| RC externo        | ~16,000,000         | ~64,000,000   | No                   | NA                     | 500                     | 494.85                 | -1.030        |
+
+**Análisis Tabla 5:** Con calor y PLL, el patrón se mantiene pero los errores se amplifican. El INTOSC mantiene -0.308%, el HS es casi perfecto con -0.004%, y el RC externo empeora a -1.03%, siendo el menos recomendable para aplicaciones de precisión en condiciones variables.
+
+---
+
+#### Tabla 6: Deriva con PLL
+
+| Modo de oscilador | RC0 deriva con PLL (Hz) |
+|-------------------|--------------------------|
+| INTOSC (interno)  | -1.63                     |
+| HS (cristal externo 16 MHz) | -0.02        |
+| RC externo        | -3.85                      |
+
+**Análisis Tabla 6:** La deriva con PLL confirma la tendencia: el HS es ultra estable (-0.02 Hz), el INTOSC tiene deriva moderada (-1.63 Hz) y el RC externo es muy inestable (-3.85 Hz). El PLL amplifica ligeramente las derivas existentes.
+
+---
+
+### Análisis General
+
+| Oscilador | Precisión en frío | Estabilidad térmica | Efecto del PLL | Recomendación |
+|-----------|-------------------|---------------------|----------------|----------------|
+| INTOSC (interno) | Buena (0.004%) | Moderada (-1.56 Hz) | Amplificación proporcional | Aplicaciones generales |
+| HS (cristal externo) | Excelente (0%) | Excelente (-0.01 Hz) | Mínimo | Aplicaciones críticas |
+| RC externo | Regular (-0.25%) | Mala (-3.55 Hz) | Amplificación significativa | Solo si no hay alternativa |
+
+**Conclusión:** El oscilador con cristal externo HS es claramente superior para aplicaciones que requieren precisión y estabilidad. El INTOSC ofrece un buen equilibrio para uso general. El RC externo solo debería usarse en aplicaciones no críticas y con temperatura controlada.
 
 ## 2.4 Diagramas
 
@@ -193,7 +348,10 @@ Fig 5. Registro OSCCON [1]
 ![alt text](image-2.png)
 
 ## 3. Evidencias de implementación
-
+* [Video lab1](https://youtu.be/1uqVIVOrfaQ)
+* [Video lab2](https://youtu.be/LPDfCZH4naY)
+* [Video lab3](https://youtu.be/ne4GAs_R6sE)
+* [Video Simulacion](https://youtu.be/C1sOraezwtQ)
 ## 4. Preguntas
 
 * ¿En qué modo se obtuvo la medición más cercana a la frecuencia teórica?
